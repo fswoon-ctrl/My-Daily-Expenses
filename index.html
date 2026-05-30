@@ -6,50 +6,47 @@
 <title>My Daily Expenses</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<!-- Pi SDK -->
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,sans-serif;background:#f4f0fa;color:#1a0533;font-size:15px}
-
-/* Pi colour palette */
 :root{
-  --pi-purple:#6528B4;
-  --pi-purple-dark:#3D1570;
-  --pi-purple-light:#EDE5FA;
-  --pi-gold:#F0A500;
-  --pi-gold-light:#FDF3D9;
-  --pi-surface:#fff;
-  --pi-bg:#f4f0fa;
-  --pi-text:#1a0533;
-  --pi-muted:#7a5e99;
-  --pi-border:rgba(101,40,180,0.15);
+  --pi-purple:#6528B4;--pi-purple-dark:#3D1570;--pi-purple-light:#EDE5FA;
+  --pi-gold:#F0A500;--pi-gold-light:#FDF3D9;--pi-surface:#fff;
+  --pi-bg:#f4f0fa;--pi-text:#1a0533;--pi-muted:#7a5e99;--pi-border:rgba(101,40,180,0.15);
 }
-
 .app{max-width:700px;margin:0 auto;padding:1rem}
 
-/* Header */
+/* Login screen */
+#login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:90vh;text-align:center;padding:2rem}
+.login-icon{width:80px;height:80px;background:var(--pi-purple);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:40px;color:var(--pi-gold);margin:0 auto 1.5rem}
+.login-title{font-size:24px;font-weight:700;color:var(--pi-purple-dark);margin-bottom:8px}
+.login-sub{font-size:14px;color:var(--pi-muted);margin-bottom:2rem;line-height:1.6}
+.btn-pi-login{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:var(--pi-purple);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(101,40,180,0.3)}
+.btn-pi-login:hover{background:var(--pi-purple-dark)}
+.btn-pi-login:disabled{opacity:0.6;cursor:not-allowed}
+.login-note{font-size:11px;color:var(--pi-muted);margin-top:1rem}
+
+/* Main app */
+#main-app{display:none}
 .header{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;padding:1rem 1.25rem;background:var(--pi-purple-dark);border-radius:14px;color:#fff}
 .header-icon{width:38px;height:38px;background:var(--pi-gold);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--pi-purple-dark);flex-shrink:0}
-.header h1{font-size:19px;font-weight:600;color:#fff}
-.header p{font-size:12px;color:rgba(255,255,255,0.65);margin-top:1px}
-
-/* Tabs */
+.header-info{flex:1}
+.header h1{font-size:18px;font-weight:600;color:#fff}
+.header p{font-size:11px;color:rgba(255,255,255,0.65);margin-top:1px}
+.user-badge{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.15);border-radius:20px;padding:4px 10px;font-size:12px;color:#fff;font-weight:500}
 .tabs{display:flex;gap:6px;margin-bottom:1.5rem;background:var(--pi-purple-light);border-radius:10px;padding:4px}
 .tab{flex:1;padding:7px;border:none;background:transparent;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--pi-purple);transition:all 0.15s}
 .tab.active{background:var(--pi-purple);color:#fff;box-shadow:0 1px 4px rgba(101,40,180,0.25)}
-
-/* Cards */
 .card{background:var(--pi-surface);border:1px solid var(--pi-border);border-radius:14px;padding:1rem 1.25rem;margin-bottom:1rem}
 .card-title{font-size:15px;font-weight:600;color:var(--pi-purple-dark);margin-bottom:1rem}
-
-/* Form */
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 label{display:block;font-size:12px;color:var(--pi-muted);margin-bottom:4px;font-weight:500}
 input,select{width:100%;padding:9px 11px;border:1.5px solid var(--pi-border);border-radius:9px;font-size:14px;background:#faf8ff;color:var(--pi-text)}
 input:focus,select:focus{outline:none;border-color:var(--pi-purple)}
-.btn-add{width:100%;padding:10px;border:none;border-radius:9px;background:var(--pi-purple);color:#fff;font-size:14px;font-weight:600;cursor:pointer;margin-top:6px;letter-spacing:0.2px}
+.btn-add{width:100%;padding:10px;border:none;border-radius:9px;background:var(--pi-purple);color:#fff;font-size:14px;font-weight:600;cursor:pointer;margin-top:6px}
 .btn-add:hover{background:var(--pi-purple-dark)}
-
-/* Metrics */
 .metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:1rem}
 .metric{background:var(--pi-surface);border:1px solid var(--pi-border);border-radius:12px;padding:12px 14px}
 .metric-label{font-size:11px;color:var(--pi-muted);margin-bottom:4px;font-weight:500}
@@ -57,13 +54,9 @@ input:focus,select:focus{outline:none;border-color:var(--pi-purple)}
 .metric.gold{background:var(--pi-gold-light);border-color:rgba(240,165,0,0.3)}
 .metric.gold .metric-value{color:#7a4d00}
 .metric.gold .metric-label{color:#a06b00}
-
-/* Period tabs */
 .period-tabs{display:flex;gap:6px;margin-bottom:1rem}
 .period-tab{padding:5px 14px;border:1.5px solid var(--pi-border);border-radius:20px;cursor:pointer;font-size:12px;font-weight:500;background:transparent;color:var(--pi-muted)}
 .period-tab.active{background:var(--pi-purple);border-color:var(--pi-purple);color:#fff}
-
-/* Expense items */
 .expense-list{display:flex;flex-direction:column;gap:6px}
 .expense-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--pi-purple-light);border-radius:10px}
 .cat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
@@ -74,39 +67,42 @@ input:focus,select:focus{outline:none;border-color:var(--pi-purple)}
 .exp-meta{font-size:11px;color:var(--pi-muted);margin-top:2px}
 .btn-del{border:none;background:none;cursor:pointer;color:var(--pi-muted);padding:2px;border-radius:4px}
 .btn-del:hover{color:#E24B4A}
-
-/* Category filter pills */
 .cat-filter{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem}
 .cat-pill{padding:4px 11px;border-radius:20px;font-size:12px;cursor:pointer;border:1.5px solid var(--pi-border);background:transparent;color:var(--pi-muted);font-weight:500}
-
-/* Summary rows */
-.summary-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--pi-border);font-size:14px;color:var(--pi-text)}
+.summary-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--pi-border);font-size:14px}
 .summary-row:last-child{border-bottom:none;font-weight:700;font-size:15px;padding-top:10px;color:var(--pi-purple-dark)}
-
 .empty{text-align:center;padding:2rem;color:var(--pi-muted);font-size:14px}
 .chart-wrap{position:relative;width:100%;height:220px}
-
-/* Today total badge */
 .today-badge{background:var(--pi-gold);color:#3a2000;font-size:14px;font-weight:700;padding:3px 10px;border-radius:20px}
-
-/* Pi branding footer */
 .pi-footer{text-align:center;padding:1rem 0 0.5rem;font-size:11px;color:var(--pi-muted)}
 .pi-logo{display:inline-flex;align-items:center;gap:4px;font-weight:700;color:var(--pi-purple)}
 </style>
 </head>
 <body>
-<div class="app">
 
-  <!-- Header -->
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-icon"><i class="ti ti-wallet" aria-hidden="true"></i></div>
+  <div class="login-title">My Daily Expenses</div>
+  <div class="login-sub">Track every ringgit, every day.<br>Sign in with your Pi account to continue.</div>
+  <button class="btn-pi-login" id="btn-login" onclick="piLogin()">
+    <i class="ti ti-circle-letter-p" aria-hidden="true"></i> Sign in with Pi
+  </button>
+  <div class="login-note">Your data is stored securely on your device.</div>
+</div>
+
+<!-- MAIN APP -->
+<div id="main-app">
+<div class="app">
   <div class="header">
     <div class="header-icon"><i class="ti ti-wallet" aria-hidden="true"></i></div>
-    <div>
+    <div class="header-info">
       <h1>My Daily Expenses</h1>
       <p>Track every ringgit, every day</p>
     </div>
+    <div class="user-badge" id="user-badge"><i class="ti ti-user" style="font-size:13px" aria-hidden="true"></i> <span id="user-name">Pioneer</span></div>
   </div>
 
-  <!-- Tabs -->
   <div class="tabs">
     <button class="tab active" onclick="switchTab('add')">Add Expense</button>
     <button class="tab" onclick="switchTab('list')">Expenses</button>
@@ -193,22 +189,62 @@ input:focus,select:focus{outline:none;border-color:var(--pi-purple)}
     <span class="pi-logo"><i class="ti ti-circle-letter-p" style="font-size:14px" aria-hidden="true"></i> Pi Browser App</span>
   </div>
 </div>
+</div>
 
 <script>
-const CAT_COLORS = {
+const CAT_COLORS={
   'Food & Drinks':'#6528B4','Transport':'#1D9E75','Shopping':'#F0A500',
   'Bills & Utilities':'#3D1570','Health':'#D85A30','Entertainment':'#9B59B6',
   'Education':'#3B6D11','Others':'#7a5e99'
 };
 
-let expenses = JSON.parse(localStorage.getItem('mde_pi_expenses') || '[]');
-let activeTab='add', activePeriod='daily', activeFilter='All', catChart=null;
+let expenses=[], activeTab='add', activePeriod='daily', activeFilter='All', catChart=null, piUser=null;
 
-function save(){ localStorage.setItem('mde_pi_expenses', JSON.stringify(expenses)); }
+// ── Pi SDK ──────────────────────────────────────────────
+function initPi(){
+  try{
+    Pi.init({ version:"2.0", sandbox: false });
+  } catch(e){ console.warn('Pi SDK not available:', e); }
+}
+
+async function piLogin(){
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader" aria-hidden="true"></i> Signing in…';
+  try {
+    const scopes = ['username', 'payments'];
+    const auth = await Pi.authenticate(scopes, onIncompletePayment);
+    piUser = auth.user;
+    document.getElementById('user-name').textContent = piUser.username || 'Pioneer';
+    loadData();
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
+    document.getElementById('inp-date').value = today();
+    renderToday();
+  } catch(e){
+    console.error('Pi login failed:', e);
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-circle-letter-p" aria-hidden="true"></i> Sign in with Pi';
+    alert('Sign-in failed. Please try again inside Pi Browser.');
+  }
+}
+
+function onIncompletePayment(payment){
+  // Handle any incomplete payments from previous sessions
+  console.log('Incomplete payment found:', payment);
+}
+
+// ── Storage ─────────────────────────────────────────────
+function storageKey(){ return 'mde_pi_'+(piUser?piUser.uid:'guest'); }
+function save(){ localStorage.setItem(storageKey(), JSON.stringify(expenses)); }
+function loadData(){ expenses = JSON.parse(localStorage.getItem(storageKey())||'[]'); }
+
+// ── Helpers ─────────────────────────────────────────────
 function today(){ return new Date().toISOString().slice(0,10); }
 function fmtDate(d){ return new Date(d+'T00:00:00').toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'}); }
 function fmtAmt(n){ return 'RM '+parseFloat(n).toFixed(2); }
 
+// ── Tabs ─────────────────────────────────────────────────
 function switchTab(t){
   activeTab=t;
   ['add','list','summary'].forEach(x=>{ document.getElementById('tab-'+x).style.display=x===t?'block':'none'; });
@@ -218,6 +254,7 @@ function switchTab(t){
   if(t==='summary') renderSummary();
 }
 
+// ── CRUD ─────────────────────────────────────────────────
 function addExpense(){
   const date=document.getElementById('inp-date').value||today();
   const amount=parseFloat(document.getElementById('inp-amount').value);
@@ -239,9 +276,9 @@ function deleteExpense(id){
   if(activeTab==='summary') renderSummary();
 }
 
+// ── Render helpers ────────────────────────────────────────
 function renderItem(e,container){
-  const div=document.createElement('div');
-  div.className='expense-item';
+  const div=document.createElement('div'); div.className='expense-item';
   div.innerHTML=`<div class="cat-dot" style="background:${CAT_COLORS[e.cat]||'#888'}"></div>
   <div class="exp-info">
     <div class="exp-top"><span class="exp-name">${e.cat}</span><span class="exp-amount">${fmtAmt(e.amount)}</span></div>
@@ -252,8 +289,7 @@ function renderItem(e,container){
 }
 
 function renderToday(){
-  const td=today();
-  const todayExp=expenses.filter(e=>e.date===td);
+  const td=today(), todayExp=expenses.filter(e=>e.date===td);
   const total=todayExp.reduce((s,e)=>s+e.amount,0);
   document.getElementById('today-total').textContent=fmtAmt(total);
   const list=document.getElementById('today-list'); list.innerHTML='';
@@ -262,7 +298,7 @@ function renderToday(){
 }
 
 function renderList(){
-  const filter=activeFilter; const sort=document.getElementById('sort-sel').value;
+  const filter=activeFilter, sort=document.getElementById('sort-sel').value;
   const cats=['All',...Object.keys(CAT_COLORS)];
   const fp=document.getElementById('cat-filter'); fp.innerHTML='';
   cats.forEach(c=>{
@@ -287,10 +323,10 @@ function setPeriod(p){
 }
 
 function getPeriodExpenses(){
-  const now=new Date(); const td=today();
+  const now=new Date(), td=today();
   if(activePeriod==='daily') return expenses.filter(e=>e.date===td);
   if(activePeriod==='weekly'){
-    const day=now.getDay(); const mon=new Date(now); mon.setDate(now.getDate()-(day===0?6:day-1)); mon.setHours(0,0,0,0);
+    const day=now.getDay(), mon=new Date(now); mon.setDate(now.getDate()-(day===0?6:day-1)); mon.setHours(0,0,0,0);
     return expenses.filter(e=>new Date(e.date+'T00:00:00')>=mon);
   }
   if(activePeriod==='monthly') return expenses.filter(e=>e.date.slice(0,7)===td.slice(0,7));
@@ -305,8 +341,7 @@ function getDayCount(){
 }
 
 function renderSummary(){
-  const exp=getPeriodExpenses();
-  const total=exp.reduce((s,e)=>s+e.amount,0);
+  const exp=getPeriodExpenses(), total=exp.reduce((s,e)=>s+e.amount,0);
   document.getElementById('s-total').textContent=fmtAmt(total);
   document.getElementById('s-count').textContent=exp.length;
   document.getElementById('s-avg').textContent=fmtAmt(total/Math.max(getDayCount(),1));
@@ -314,11 +349,9 @@ function renderSummary(){
   exp.forEach(e=>{ catTotals[e.cat]=(catTotals[e.cat]||0)+e.amount; });
   const sorted=Object.entries(catTotals).sort((a,b)=>b[1]-a[1]);
   document.getElementById('s-top').textContent=sorted.length?sorted[0][0]:'—';
-  const labels=sorted.map(x=>x[0]); const data=sorted.map(x=>x[1]);
-  const colors=labels.map(l=>CAT_COLORS[l]||'#888');
+  const labels=sorted.map(x=>x[0]), data=sorted.map(x=>x[1]), colors=labels.map(l=>CAT_COLORS[l]||'#888');
   if(catChart){ catChart.destroy(); catChart=null; }
-  const ctx=document.getElementById('cat-chart').getContext('2d');
-  catChart=new Chart(ctx,{
+  catChart=new Chart(document.getElementById('cat-chart').getContext('2d'),{
     type:'doughnut',
     data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:2,borderColor:'#fff'}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>' '+fmtAmt(i.raw)+' ('+Math.round(i.raw/total*100)+'%)'}}}}
@@ -330,8 +363,8 @@ function renderSummary(){
     +`<div class="summary-row"><span>Total</span><span>${fmtAmt(total)}</span></div>`;
 }
 
-document.getElementById('inp-date').value=today();
-renderToday();
+// ── Init ─────────────────────────────────────────────────
+initPi();
 </script>
 </body>
 </html>
